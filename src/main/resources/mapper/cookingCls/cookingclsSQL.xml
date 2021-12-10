@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cookingcls">
+
+	<!-- 
+	DaoImpl단
+getSqlSession().selectOne("호출매퍼.호출ID")
+
+
+mybatis xml mapper단
+
+<mapper namespace="호출매퍼"><select id="호출ID"></select>
+	 -->
+	
+	<!-- 쿠킹클래스 전체 조회 -->
+	<select id="selectClassList" parameterType="map"  resultType="ccls">
+		select *
+		from
+		(select 
+			rownum as rnum,
+			c.*
+		from
+		(select
+			class_no as classNo,
+			member_nickname as memberNickname,
+			class_title as classTitle,
+			class_price as classPrice
+		from cooking_class order by class_no asc) c)
+		where rnum between #{start} and #{end}
+	</select>
+	
+	<!-- 전체 페이지 수 -->
+	<select id="totalCount" resultType="_int">
+		select count(*) from cooking_class
+	</select>
+	
+	<!-- 쿠킹클래스 조회 -->
+	<select id="selectOneClass" parameterType="_int" resultType="ccls">
+		select 
+			class_no as classNo,
+			class_title as classTitle,
+			member_nickname as memberNickname,
+			class_content as ClassContent,
+			class_start as classStart,
+			class_end as classEnd,
+			class_price as classPrice,
+			class_rate as classRate,
+			class_nop as classNop,
+			class_curr_nop as classCurrNop,
+			class_status as classStatus,
+			class_reg_date as classRegDate,
+			class_time as classTime,
+			class_location as classLocation
+		from cooking_class 
+		where class_no=#{classNo}
+	</select>
+	
+	<!-- 쿠킹 클래스 삭제 -->
+	<delete id="deleteOneClass" parameterType="_int">
+		delete from cooking_class where class_No=#{classNo}
+	</delete>
+	
+	<!-- 쿠킹 클래스 현재 인원수 -->
+	<select id="selectCurrClsCnt" parameterType="_int" resultType="_int">
+		select class_curr_nop as classCurrNop
+		from cooking_class 
+		where class_no=#{classNo}
+	</select>
+	
+	<!-- 쿠킹클래스 햔재 인원수 증가 -->
+	<update id="incCookingClsNop" parameterType="_int">
+		update cooking_class set class_curr_nop=class_curr_nop+1 where class_no=#{classNo}
+	</update>
+	
+	<!-- 쿠킹클래스 햔재 인원수 감소 -->
+	<update id="decCookingClsNop" parameterType="_int">
+		update cooking_class set class_curr_nop=class_curr_nop-1 where class_no=#{classNo}
+	</update>
+	
+	<!-- 클래스 개설자 닉네임 -->
+	<select id="selectOneNickname" parameterType="_int" resultType="String">
+		select
+			member_nickname as memberNickname
+		from cooking_class
+		where class_no=#{classNo}
+	</select>
+	
+	
+</mapper>
